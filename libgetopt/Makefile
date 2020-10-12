@@ -1,11 +1,10 @@
-CC := gcc
-CFLAGS := -O2
+include ../config.mk
 
 libgetopt.o: getopt.o
 	mv getopt.o libgetopt.o
 
 clean:
-	rm *.o *.so
+	rm -f *.o *.so
 
 %.o: %.c
 	$(CC) $$DEBUG $(CFLAGS) -fpic -c $<

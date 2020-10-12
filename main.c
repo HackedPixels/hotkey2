@@ -44,7 +44,8 @@ static int handler(void* user, const char* section, const char* name, const char
 int writeout(struct handler_args* args);
 
 const int VERSION = 0x01;
-const int OFFSET  = 0x03;
+const int OFFSET  = 0x00;
+const int INT_LEN = sizeof(int);
 
 int
 main(int argc, char** argv)
@@ -58,6 +59,7 @@ main(int argc, char** argv)
 	config.key          = malloc(MAX_KEYBINDS); //max keycombo
 	config.file         = malloc(MAX_FILEPATH_LEN);
 	config.file_name    = malloc(MAX_FILEPATH_LEN);
+	config.flags        = 0;
 
 	if (config.section_name == NULL) {
 		printf("Could not allocate buffer\n");
@@ -95,7 +97,7 @@ writeout(struct handler_args* args)
 	// clear config
 	memset(args->key, 0, MAX_KEYBIND_NAME);
 	memset(args->file, 0, MAX_FILEPATH_LEN);
-	return fwrite(buffer, 1, len, args->output_file);
+	return fwrite(buffer, 1, len-1, args->output_file);
 }
 
 static int
@@ -154,6 +156,7 @@ handler(void* dstruct, const char* section, const char* name, const char* value)
 			}
 			args->flags |= FLAG_ACTION;
 		}
+		printf("flags: %d\n", args->flags);
 	} else if (MATCH(section, "output-file")) {
 		if (MATCH(name, "file")) {
 			strcpy(args->file_name, value);
@@ -162,6 +165,7 @@ handler(void* dstruct, const char* section, const char* name, const char* value)
 			
 			// warning: this is unsafe
 			// TODO: Fix this, pleb.
+			fwrite(&INT_LEN, sizeof(char), 1, args->output_file);
 			fwrite(&VERSION, sizeof(int), 1, args->output_file);
 			fwrite(&OFFSET, sizeof(int), 1, args->output_file);
 			return 2;

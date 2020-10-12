@@ -1,11 +1,10 @@
-CC := gcc
-CFLAGS := -O2
+include ../config.mk
 
 libini.o: ini.o
 	mv ini.o libini.o
 
 clean:
-	rm *.o *.so
+	rm -f *.o *.so
 
 %.o: %.c
 	$(CC) $$DEBUG $(CFLAGS) -fpic -c $<
